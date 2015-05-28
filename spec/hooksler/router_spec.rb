@@ -107,12 +107,12 @@ describe Hooksler::Router do
   end
 
   context 'configure' do
-    let(:proc) { ->() {} }
+    let(:proc) { ->(*args) {} }
 
     context 'init config' do
       subject { Hooksler::Router }
       it do
-        expect(subject).to receive(:config).with(&proc)
+        expect(subject).to receive(:config).with(no_args)
         subject.config(&proc)
       end
 
@@ -151,7 +151,7 @@ describe Hooksler::Router do
         end
 
         it do
-          expect(subject).to receive(:endpoints).with(&proc)
+          expect(subject).to receive(:endpoints).with(no_args)
           subject.endpoints(&proc)
         end
 
@@ -167,7 +167,7 @@ describe Hooksler::Router do
 
       context 'withot secret code' do
         it do
-          expect(subject).to receive(:endpoints).with(&proc)
+          expect(subject).to receive(:endpoints).with(no_args)
           subject.endpoints(&proc)
         end
 
@@ -247,7 +247,7 @@ describe Hooksler::Router do
       end
 
       context 'from as symbol array' do
-        let (:from) { %i(from) }
+        let (:from) { [:from] }
         let (:to)   { 'to' }
         it_behaves_like 'a right route'
       end
