@@ -22,7 +22,29 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+
+routing.rb
+
+
+```ruby
+
+    Hooksler::Router.config do
+      secret_key '123456789'
+
+      endpoints do
+        in 'hook_1', type: :github,   label: %i(git)
+        in 'hook_2', type: :newrelic, label: %i(production)
+
+        out 'out_1', type: :slack, url: '', channel: '#test'
+        out 'out_2', type: :email, smtp: {}, to: []
+      end
+
+      route 'hook_1' => %w(out_1 out_2)
+      route 'hook_2' => %w(out_1)
+    end
+
+```
+
 
 ## Development
 

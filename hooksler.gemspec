@@ -6,8 +6,8 @@ require 'hooksler/version'
 Gem::Specification.new do |spec|
   spec.name          = "hooksler"
   spec.version       = Hooksler::VERSION
-  spec.authors       = ["ajieks@vmp.ru"]
-  spec.email         = ["ajieks@vmp.ru"]
+  spec.authors       = ["schalexey@gmail.com"]
+  spec.email         = ["schalexey@gmail.com"]
 
   spec.summary       = %q{TODO: Write a short summary, because Rubygems requires one.}
   spec.description   = %q{TODO: Write a longer description or delete this line.}
@@ -27,6 +27,13 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_development_dependency "bundler", "~> 1.9"
-  spec.add_development_dependency "rake", "~> 10.0"
+  spec.add_dependency "rack"
+  spec.add_dependency 'hitimes'
+
+  spec.add_development_dependency 'bundler', '~> 1.9'
+  spec.add_development_dependency 'rake', '~> 10.0'
+  spec.add_development_dependency 'pry'
+  spec.add_development_dependency 'rspec'
+  spec.add_development_dependency 'rack-test', ['>= 0']
+  spec.add_development_dependency 'simplecov'
 end
