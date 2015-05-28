@@ -2,7 +2,6 @@ language: ruby
 cache: bundler
 bundler_args: "--binstubs --without documentation --path ../bundle --retry=3 --jobs=3"
 rvm:
-- 1.9.2
 - 1.9.3
 - 2.0.0
 - ruby-head
