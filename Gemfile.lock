@@ -2,6 +2,7 @@ PATH
   remote: .
   specs:
     hooksler (0.1.0)
+      hitimes
       rack
 
 GEM
@@ -9,6 +10,8 @@ GEM
   specs:
     celluloid (0.15.2)
       timers (~> 1.1.0)
+    codeclimate-test-reporter (0.4.7)
+      simplecov (>= 0.7.1, < 1.0.0)
     coderay (1.1.0)
     diff-lcs (1.2.5)
     docile (1.1.5)
@@ -23,6 +26,7 @@ GEM
     guard-rspec (4.2.10)
       guard (~> 2.1)
       rspec (>= 2.14, < 4.0)
+    hitimes (1.2.2)
     listen (2.7.8)
       celluloid (>= 0.15.2)
       rb-fsevent (>= 0.9.3)
@@ -63,6 +67,7 @@ PLATFORMS
 
 DEPENDENCIES
   bundler (~> 1.9)
+  codeclimate-test-reporter
   guard
   guard-rspec
   hooksler!

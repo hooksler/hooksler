@@ -1,0 +1,14 @@
+language: ruby
+cache: bundler
+bundler_args: "--binstubs --without documentation --path ../bundle --retry=3 --jobs=3"
+rvm:
+- 1.9.2
+- 1.9.3
+- 2.0.0
+- ruby-head
+# uncomment this line if your project needs to run something other than `rake`:
+script: bundle exec rspec spec --require spec_helper
+
+addons:
+  code_climate:
+    repo_token: 37f5ce3b968d143a1fb19e75f504204d5588b6724882b208a910b2ebcf5cb909
