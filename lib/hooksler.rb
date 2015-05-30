@@ -11,5 +11,7 @@ module Hooksler
   autoload :Outbound, 'hooksler/outbound'
   autoload :Endpoints, 'hooksler/endpoints'
 
+  autoload :Message, 'hooksler/message' 
+
   autoload :Application, 'hooksler/application'
 end

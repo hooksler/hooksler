@@ -9,17 +9,29 @@ module Hooksler
 
       @name = name
       @to = to
-      @params = params
       @filters = [*params.delete(:filter)]
+      @params = params
     end
 
     def process(message)
       return unless @to
       return unless @to.respond_to? :dump
 
-      message = @filters.inject(message) {|a, e| e.call(a, @params) if a }
-
-      @to.dump message if message
+      message = @filters.inject(message) do |msg, filter| 
+        next unless validate_message! msg
+        filter.call(msg, @params)
+      end
+           
+      @to.dump message if validate_message! message
     end
+
+    private
+    
+    def validate_message!(message)
+      return false unless message
+      fail 'message object must be inherited from Hooksler::Message' unless message.is_a? Hooksler::Message
+      true
+    end
+
   end
 end

@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe Hooksler::Router do
+  
+  subject { Hooksler::Router.config }
 
   let(:inbound) {
     unless defined? TestInbound
@@ -138,6 +140,7 @@ describe Hooksler::Router do
     end
 
     context 'endpoints' do
+      subject { Hooksler::Router.new }
       it do
         should respond_to :endpoints
       end
@@ -165,7 +168,7 @@ describe Hooksler::Router do
         end
       end
 
-      context 'withot secret code' do
+      context 'without secret code' do
         it do
           expect(subject).to receive(:endpoints).with(no_args)
           subject.endpoints(&proc)
@@ -197,6 +200,25 @@ describe Hooksler::Router do
         end if defined? to
       end
 
+     context 'print routes' do
+
+        let (:from) { %w(from) }
+        let (:to)   { 'to' }
+
+        before do
+          subject.route from => to
+        end
+
+        it do
+          expect(Hooksler::Router).to be_respond_to :print
+        end
+
+        it do
+	  expect { Hooksler::Router.print } .to_not raise_exception
+        end
+      end
+
+
       shared_examples 'a right route' do
 
         it do
@@ -219,6 +241,13 @@ describe Hooksler::Router do
             subject.route(from => to)
             expect { subject.resolve_path path } .to_not raise_exception
           end
+
+          it  do
+            subject.secret_code 'code'
+            subject.route(from => to)
+            expect { Hooksler::Router.resolve_path path } .to_not raise_exception
+          end
+
         end
       end
 
