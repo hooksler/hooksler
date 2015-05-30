@@ -100,6 +100,7 @@ module Hooksler
 
     def resolve_path(path)
       return unless @endpoints
+      return if path.to_s.empty?
       type, _name, key  = path.split('/').select { |s| !(s.nil? || s.empty?) }
 
       fail "unknown type #{type}" unless self.class.inbounds.key? type.to_sym

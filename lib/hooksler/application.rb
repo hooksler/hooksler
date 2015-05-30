@@ -39,6 +39,7 @@ module Hooksler
 
       ['200', {'Content-Type' => 'text/html'}, ['']]
     rescue => e
+      puts e.backtrace
       ['503', {'Content-Type' => 'text/html'}, [e.to_s]]
     end
   end

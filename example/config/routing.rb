@@ -10,5 +10,5 @@ Hooksler::Router.config do
 
   route 'in_1' => 'out_1', a:1 , b: 2
   route 'in_2' => 'out_2', a:1 , c: 2
-  route 'in_1' => 'out_2', filter: [ ->(m, p = {}) { m*2 }]
+  route 'in_1' => 'out_2', filter: [ ->(m, p = {}) { m.message *= 2; m }]
 end

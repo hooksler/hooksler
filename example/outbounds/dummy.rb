@@ -7,7 +7,6 @@ class DummyOutbound
   end
 
   def dump(message)
-    puts @params.inspect
-    puts message
+    puts message.message
   end
 end

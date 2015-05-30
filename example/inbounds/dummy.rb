@@ -7,6 +7,8 @@ class DummyInbound
   end
 
   def load(request)
-    request.body.read
+    message = Hooksler::Message.new
+    message.message = request.body.read
+    message
   end
 end
