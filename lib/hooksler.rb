@@ -7,8 +7,9 @@ module Hooksler
 
   autoload :Router,  'hooksler/router'
   autoload :Route,  'hooksler/route'
-  autoload :Inbound, 'hooksler/inbound'
-  autoload :Outbound, 'hooksler/outbound'
+  autoload :Inbound, 'hooksler/channel'
+  autoload :Outbound, 'hooksler/channel'
+  autoload :Channel,  'hooksler/channel'
   autoload :Endpoints, 'hooksler/endpoints'
 
   autoload :Message, 'hooksler/message' 
