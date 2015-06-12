@@ -8,31 +8,32 @@ module Hooksler
     def initialize
       @root = File.dirname ENV['BUNDLE_GEMFILE']
 
-      Dir.glob(File.join(@root, 'inbounds/*.rb')).each do |file|
+      Dir.glob(File.join(@root, 'inputs/*.rb')).each do |file|
         require file
       end
-      Dir.glob(File.join(@root, 'outbounds/*.rb')).each do |file|
+      Dir.glob(File.join(@root, 'outputs/*.rb')).each do |file|
         require file
       end
 
       require File.join(@root, 'config', 'routing.rb')
-
-      Hooksler::Router.print
     end
 
     def call(env)
       req = Rack::Request.new(env)
+      if req.path =~ /\/_endpoints_$/
+        ['200', {'Content-Type' => 'application/json'}, [MultiJson.dump(Hooksler::Router.info)]]
+      else
+        from_instance, routes = Hooksler::Router.resolve_path req.fullpath
+        return ['410', {'Content-Type' => 'text/html'}, ['Gone']] unless from_instance
 
-      from_instance, routes = Hooksler::Router.resolve_path req.fullpath
-      return ['410', {'Content-Type' => 'text/html'}, ['Gone']] unless from_instance
+        message = from_instance.load(req)
 
-      message = from_instance.load(req)
+        routes.each do |route|
+          route.process(message)
+        end
 
-      routes.each do |route|
-        route.process(message)
+        ['200', {'Content-Type' => 'text/plain'}, ['']]
       end
-
-      ['200', {'Content-Type' => 'text/html'}, ['']]
     rescue => e
       puts e
       puts e.backtrace

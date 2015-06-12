@@ -207,11 +207,11 @@ describe Hooksler::Router do
         end
 
         it do
-          expect(Hooksler::Router).to be_respond_to :print
+          expect(Hooksler::Router).to be_respond_to :info
         end
 
         it do
-          expect { Hooksler::Router.print }.to_not raise_exception
+          expect { Hooksler::Router.info }.to_not raise_exception
         end
       end
 

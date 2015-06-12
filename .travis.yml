@@ -10,4 +10,4 @@ script: bundle exec rspec spec --require spec_helper
 
 addons:
   code_climate:
-    repo_token: 1d59bfbc2b71cac7d09292de4e62b41e77693c5f46e43dd3ca62c7579c9d0caa
+    repo_token: 8742c58d209f105d62e1a8c727f2cca1d147376f940ca1506538a3d8098effd3

@@ -1,7 +1,8 @@
 module Hooksler
   class Router
 
-    class RouteNotFound < Hooksler::Error; end
+    class RouteNotFound < Hooksler::Error;
+    end
 
     @endpoints = nil
     @channels = {input: {}, output: {}}
@@ -40,17 +41,13 @@ module Hooksler
       @channels[:output]
     end
 
-    def self.print
-      puts ""
-      puts '#' * 40
-      puts '#' + 'ENDPOINTS'.center(38,' ') + '#'
-      puts '#' * 40
-
+    def self.info
+      info = {}
       @instance.routes.each do |from, to_list|
-        path = @instance.endpoints.path(from)
-        puts "#{host_name}#{path}\n\t#{from} -> #{to_list.map(&:name).join(', ')}"
-    end
-      puts ""
+        path = host_name + @instance.endpoints.path(from)
+        info[path] = {from => to_list}
+      end
+      info
     end
 
     def self.host_name(host=nil)
@@ -86,7 +83,6 @@ module Hooksler
     end
 
 
-
     def route(params)
       fail 'route must be a Hash' unless params.is_a? Hash
 
@@ -114,20 +110,18 @@ module Hooksler
     end
 
     def resolve_path(path)
-      return unless @endpoints
-      return if path.to_s.empty?
+      return if !@endpoints || path.to_s.empty?
 
-      type, _name, key  = path.split('/').select { |s| !(s.nil? || s.empty?) }
+      type, _name, key = path.split('/').select { |s| !(s.nil? || s.empty?) }
 
       return unless type && _name && key
 
       fail "unknown type #{type}" unless self.class.inbounds.key? type.to_sym
-
       from_instance, _type, name = @endpoints.resolve :input, key
 
       fail RouteNotFound.new "route for #{name} not found" unless @routes.key? name.to_sym
 
-      [ from_instance, @routes[name.to_sym] ]
+      [from_instance, @routes[name.to_sym]]
     rescue KeyError
       nil
     end
