@@ -1,6 +1,6 @@
-[![Code Climate](https://codeclimate.com/github/fuCtor/hooksler/badges/gpa.svg)](https://codeclimate.com/github/fuCtor/hooksler)
-[![Test Coverage](https://codeclimate.com/github/fuCtor/hooksler/badges/coverage.svg)](https://codeclimate.com/github/fuCtor/hooksler/coverage)
-[![Build Status](https://travis-ci.org/fuCtor/hooksler.svg?branch=master)](https://travis-ci.org/fuCtor/hooksler)
+[![Code Climate](https://codeclimate.com/github/hooksler/hooksler/badges/gpa.svg)](https://codeclimate.com/github/hooksler/hooksler)
+[![Test Coverage](https://codeclimate.com/github/hooksler/hooksler/badges/coverage.svg)](https://codeclimate.com/github/hooksler/hooksler/coverage)
+[![Build Status](https://travis-ci.org/hooksler/hooksler.svg?branch=master)](https://travis-ci.org/hooksler/hooksler)
 
 # Hooksler
 
@@ -33,18 +33,25 @@ routing.rb
 ```ruby
 
     Hooksler::Router.config do
-      secret_key '123456789'
-
+      secret_code 'very_secret_code'
+      host_name 'http://example.com'
+    
       endpoints do
-        input 'hook_1', type: :github,   label: %i(git)
-        input 'hook_2', type: :newrelic, label: %i(production)
-
-        output 'out_1', type: :slack, url: '', channel: '#test'
-        output 'out_2', type: :email, smtp: {}, to: []
+        input  'simple',        type: :simple
+        input  'newrelic',      type: :newrelic
+        input  'trello',        type: :trello,
+               create: false,
+               public_key: ENV['TRELLO_KEY'],
+               member_token: ENV['TRELLO_TOKEN'],
+               board_id: ENV['TRELLO_ID1']
+    
+        output 'black_hole', type: :dummy
+        output 'slack_out', type: :slack, url: ENV['SLACK_WEBHOOK_URL'], channel: '#test'
       end
-
-      route 'hook_1' => %w(out_1 out_2)
-      route 'hook_2' => %w(out_1)
+    
+      route 'simple'       => 'slack_out'
+      route 'trello'       => ['black_hole', 'slack_out']
+      route 'newrelic'     => ['black_hole', 'slack_out']
     end
 
 ```
