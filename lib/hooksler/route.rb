@@ -4,8 +4,8 @@ module Hooksler
     attr_reader :to
     attr_reader :name
 
-    def initialize(name, to, params)
-      fail "TO must be OUTBOUND" unless to.class.is_a? Hooksler::Outbound
+    def initialize(name, to, params = {})
+      fail "TO must be Hooksler::Channel::Output" unless to.class.is_a? Hooksler::Channel::Output
 
       @name = name
       @to = to

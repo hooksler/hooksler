@@ -1,24 +1,15 @@
 require 'spec_helper'
 
+require 'service/channels'
+
 describe Hooksler::Endpoints do
   subject { Hooksler::Endpoints.new('code') }
 
   context 'input endpoints' do
-    let(:inbound) {
-      unless defined? TestInbound
-        TestInbound = Class.new do
-          def initialize(*_); end
-        end
-        TestInbound.send :extend, Hooksler::Inbound
-        TestInbound.define_singleton_method :build do |*args|
-          self.new
-        end unless TestInbound.respond_to? :build
-      end
-      TestInbound
-    }
+    let(:inbound) { TestInbound }
 
     before do
-      Hooksler::Router.register :inbound, :test, inbound
+      Hooksler::Router.register :input, :test, inbound
     end
 
     it do
@@ -84,7 +75,7 @@ describe Hooksler::Endpoints do
     }
 
     before do
-      Hooksler::Router.register :outbound, :test, outbound
+      Hooksler::Router.register :output, :test, outbound
     end
 
     it do

@@ -18,6 +18,9 @@ module Hooksler
       instance = klass.build(params)
 
       @instances[:input][encode_name(name)] = [instance, type, name.to_s]
+
+      instance.route_defined(path(name)) if instance
+
       instance
     end
 

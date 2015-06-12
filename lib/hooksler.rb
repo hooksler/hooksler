@@ -7,8 +7,6 @@ module Hooksler
 
   autoload :Router,  'hooksler/router'
   autoload :Route,  'hooksler/route'
-  autoload :Inbound, 'hooksler/channel'
-  autoload :Outbound, 'hooksler/channel'
   autoload :Channel,  'hooksler/channel'
   autoload :Endpoints, 'hooksler/endpoints'
 
@@ -16,3 +14,6 @@ module Hooksler
 
   autoload :Application, 'hooksler/application'
 end
+
+require 'hooksler/simple_input'
+

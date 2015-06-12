@@ -1,34 +1,14 @@
 require 'spec_helper'
 
+require 'service/channels'
+
 describe Hooksler::Router do
-  
+
   subject { Hooksler::Router.config }
 
-  let(:inbound) {
-    unless defined? TestInbound
-      TestInbound = Class.new do
-        def initialize(*_); end
-      end
-      TestInbound.send :extend, Hooksler::Inbound
-      TestInbound.define_singleton_method :build do |*args|
-        self.new
-      end unless TestInbound.respond_to? :build
-    end
-    TestInbound
-  }
+  let(:inbound) { TestInbound }
 
-  let(:outbound) {
-    unless defined? TestOutbound
-      TestOutbound = Class.new do
-        def initialize(*_); end
-      end
-      TestOutbound.send :extend, Hooksler::Outbound
-      TestOutbound.define_singleton_method :build do |*args|
-        self.new
-      end unless TestOutbound.respond_to? :build
-    end
-    TestOutbound
-  }
+  let(:outbound) { TestOutbound }
 
   context 'class' do
     subject { Hooksler::Router }
@@ -45,17 +25,17 @@ describe Hooksler::Router do
       context 'after register new' do
         context 'without extend' do
           it do
-            expect { subject.register :inbound, Class.new }.to raise_exception
+            expect { subject.register :input, Class.new }.to raise_exception
           end
         end
 
         it do
-          expect(subject).to receive(:register).with(:inbound, 'test', inbound)
-          subject.register :inbound, 'test', inbound
+          expect(subject).to receive(:register).with(:input, 'test', inbound)
+          subject.register :input, 'test', inbound
         end
 
         it do
-          expect { subject.register :inbound, 'test', inbound }.to_not raise_exception
+          expect { subject.register :input, 'test', inbound }.to_not raise_exception
           expect(subject.inbounds).to_not be_empty
         end
 
@@ -76,17 +56,17 @@ describe Hooksler::Router do
       context 'after register new' do
         context 'without extend' do
           it do
-            expect { subject.register :outbound, Class.new }.to raise_exception
+            expect { subject.register :output, Class.new }.to raise_exception
           end
         end
 
         it do
-          expect(subject).to receive(:register).with(:outbound, 'test', outbound)
-          subject.register :outbound, 'test', outbound
+          expect(subject).to receive(:register).with(:output, 'test', outbound)
+          subject.register :output, 'test', outbound
         end
 
         it do
-          expect { subject.register :outbound, 'test', outbound }.to_not raise_exception
+          expect { subject.register :output, 'test', outbound }.to_not raise_exception
           expect(subject.outbounds).to_not be_empty
         end
 
@@ -139,6 +119,23 @@ describe Hooksler::Router do
       end
     end
 
+
+    context 'host name' do
+      it do
+        should respond_to :host_name
+      end
+
+      it do
+        expect(subject).to receive(:host_name).with('host') { 'host' }
+        subject.host_name('host')
+      end
+
+      it do
+        expect(subject.host_name('host')).to be_eql('host')
+        expect(subject.host_name('other_host')).to be_eql('host')
+      end
+    end
+
     context 'endpoints' do
       subject { Hooksler::Router.new }
       it do
@@ -175,7 +172,7 @@ describe Hooksler::Router do
         end
 
         it do
-          expect{ subject.endpoints(&proc) } .to raise_error /secret code/
+          expect { subject.endpoints(&proc) }.to raise_error /secret code/
         end
       end
 
@@ -187,8 +184,8 @@ describe Hooksler::Router do
       end
 
       before do
-        Hooksler::Router.register :inbound, :test, inbound
-        Hooksler::Router.register :outbound, :test, outbound
+        Hooksler::Router.register :input, :test, inbound
+        Hooksler::Router.register :output, :test, outbound
         subject.secret_code 'code'
 
         [*from].each do |i|
@@ -200,10 +197,10 @@ describe Hooksler::Router do
         end if defined? to
       end
 
-     context 'print routes' do
+      context 'print routes' do
 
         let (:from) { %w(from) }
-        let (:to)   { 'to' }
+        let (:to) { 'to' }
 
         before do
           subject.route from => to
@@ -214,7 +211,7 @@ describe Hooksler::Router do
         end
 
         it do
-	  expect { Hooksler::Router.print } .to_not raise_exception
+          expect { Hooksler::Router.print }.to_not raise_exception
         end
       end
 
@@ -227,7 +224,7 @@ describe Hooksler::Router do
         end
 
         it do
-          expect{ subject.route(from => to) } .to_not raise_exception
+          expect { subject.route(from => to) }.to_not raise_exception
         end
 
         context 'resolve path' do
@@ -236,17 +233,42 @@ describe Hooksler::Router do
             key = subject.endpoints.encode_name name
             "/test/#{name}/#{key}"
           }
-          it  do
+
+          before do
             subject.secret_code 'code'
+            subject.host_name 'host'
             subject.route(from => to)
-            expect { subject.resolve_path path } .to_not raise_exception
           end
 
-          it  do
-            subject.secret_code 'code'
-            subject.route(from => to)
-            expect { Hooksler::Router.resolve_path path } .to_not raise_exception
+          it do
+            expect { subject.resolve_path path }.to_not raise_exception
           end
+
+          context 'wrong path' do
+            it do
+              expect { subject.resolve_path path + '1' }.to_not raise_exception
+              expect(subject.resolve_path(path + '1')).to be_nil
+            end
+          end
+
+          it do
+            expect { Hooksler::Router.resolve_path path }.to_not raise_exception
+          end
+
+          it do
+            expect(Hooksler::Router.resolve_path path).to be_instance_of Array
+            expect(Hooksler::Router.resolve_path(path).size).to be_eql(2)
+            from, route = Hooksler::Router.resolve_path path
+            expect(from).to be_instance_of TestInbound
+            expect(route).to be_instance_of Array
+          end
+
+          it do
+            expect(Hooksler::Router.resolve_path nil).to be_nil
+            expect(Hooksler::Router.resolve_path '').to be_nil
+            expect(Hooksler::Router.resolve_path '/').to be_nil
+          end
+
 
         end
       end
@@ -258,92 +280,92 @@ describe Hooksler::Router do
         end
 
         it do
-          expect{ subject.route(from => to) } .to raise_exception /must be string or symbol/
+          expect { subject.route(from => to) }.to raise_exception /must be string or symbol/
         end
       end
 
       context 'from as string' do
         let (:from) { 'from' }
-        let (:to)   { 'to' }
+        let (:to) { 'to' }
         it_behaves_like 'a right route'
       end
 
 
       context 'from as symbol' do
         let (:from) { :from }
-        let (:to)   { 'to' }
+        let (:to) { 'to' }
         it_behaves_like 'a right route'
       end
 
       context 'from as symbol array' do
         let (:from) { [:from] }
-        let (:to)   { 'to' }
+        let (:to) { 'to' }
         it_behaves_like 'a right route'
       end
 
       context 'from as string array' do
         let (:from) { %w(from) }
-        let (:to)   { 'to' }
+        let (:to) { 'to' }
         it_behaves_like 'a right route'
       end
 
       context 'from as string|symbol array' do
         let (:from) { ['from', :from12] }
-        let (:to)   { 'to' }
+        let (:to) { 'to' }
         it_behaves_like 'a right route'
       end
 
       context 'from as other type' do
         let (:from) { 1 }
-        let (:to)   { 'to' }
+        let (:to) { 'to' }
         it_behaves_like 'a wrong route'
       end
 
       context 'from as array of other type' do
         let (:from) { [1] }
-        let (:to)   { 'to' }
+        let (:to) { 'to' }
         it_behaves_like 'a wrong route'
       end
 
       context 'to as string' do
         let (:from) { 'from' }
-        let (:to)   { 'to' }
+        let (:to) { 'to' }
         it_behaves_like 'a right route'
       end
 
       context 'to as symbol' do
         let (:from) { 'from' }
-        let (:to)   { :to }
+        let (:to) { :to }
         it_behaves_like 'a right route'
       end
 
       context 'to as string array' do
         let (:from) { 'from' }
-        let (:to)   { ['to'] }
+        let (:to) { ['to'] }
         it_behaves_like 'a right route'
       end
 
       context 'to as symbol array' do
         let (:from) { 'from' }
-        let (:to)   { [:to] }
+        let (:to) { [:to] }
         it_behaves_like 'a right route'
       end
 
       context 'to as string|symbol array' do
         let (:from) { 'from' }
-        let (:to)   { ['to', :to] }
+        let (:to) { ['to', :to] }
         it_behaves_like 'a right route'
       end
 
       context 'to as other type' do
         let (:from) { 'from' }
-        let (:to)   { 1 }
+        let (:to) { 1 }
         it_behaves_like 'a wrong route'
       end
 
       context 'to as array of other type' do
         let (:from) { 'from' }
-        let (:to)   { [1] }
+        let (:to) { [1] }
         it_behaves_like 'a wrong route'
       end
 

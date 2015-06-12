@@ -4,8 +4,8 @@ module Hooksler
     class RouteNotFound < Hooksler::Error; end
 
     @endpoints = nil
-    @bounds = {inbound: {}, outbound: {}}
-    VALID_TYPES = [:inbound, :outbound].freeze
+    @channels = {input: {}, output: {}}
+    VALID_TYPES = [:input, :output].freeze
 
     attr_reader :routes
 
@@ -13,13 +13,13 @@ module Hooksler
       fail "Unknown type #{type} allow #{VALID_TYPES.join(', ')}" unless VALID_TYPES.include? type
 
       case type
-        when :inbound
-          fail 'Instance must be extended by Hooksler::Inbound' unless klass.is_a? Hooksler::Inbound
-        when :outbound
-          fail 'Instance must be extended by Hooksler::Outbound' unless klass.is_a? Hooksler::Outbound
+        when :input
+          fail 'Instance must be extended by Hooksler::Inbound' unless klass.is_a? Hooksler::Channel::Input
+        when :output
+          fail 'Instance must be extended by Hooksler::Outbound' unless klass.is_a? Hooksler::Channel::Output
       end
 
-      @bounds[type][name.to_sym] = klass
+      @channels[type][name.to_sym] = klass
     end
 
     def self.resolve_path(*args)
@@ -33,11 +33,11 @@ module Hooksler
     end
 
     def self.inbounds
-      @bounds[:inbound]
+      @channels[:input]
     end
 
     def self.outbounds
-      @bounds[:outbound]
+      @channels[:output]
     end
 
     def self.print
@@ -48,9 +48,22 @@ module Hooksler
 
       @instance.routes.each do |from, to_list|
         path = @instance.endpoints.path(from)
-        puts "#{path}\n\t#{from} -> #{to_list.map(&:name).join(', ')}"
+        puts "#{host_name}#{path}\n\t#{from} -> #{to_list.map(&:name).join(', ')}"
     end
       puts ""
+    end
+
+    def self.host_name(host=nil)
+      if defined? @host_name
+        @host_name
+      else
+        return ENV['HOST_NAME'] if host.nil?
+        @host_name = host
+      end
+    end
+
+    def host_name(host=nil)
+      self.class.host_name(host)
     end
 
     def endpoints(&block)
@@ -72,6 +85,8 @@ module Hooksler
       end
     end
 
+
+
     def route(params)
       fail 'route must be a Hash' unless params.is_a? Hash
 
@@ -88,11 +103,11 @@ module Hooksler
         @routes[i.to_sym] += [*to].map do |it|
 
           fail 'to must be string or symbol' unless it.is_a?(String) || it.is_a?(Symbol)
-          outbound = @endpoints.resolve :output, it
+          output = @endpoints.resolve :output, it
 
-          fail 'unknown out endpoint' unless outbound
+          fail 'unknown out endpoint' unless output
 
-          Hooksler::Route.new it, outbound, params
+          Hooksler::Route.new it, output, params
         end
       end
       @routes
@@ -101,7 +116,10 @@ module Hooksler
     def resolve_path(path)
       return unless @endpoints
       return if path.to_s.empty?
+
       type, _name, key  = path.split('/').select { |s| !(s.nil? || s.empty?) }
+
+      return unless type && _name && key
 
       fail "unknown type #{type}" unless self.class.inbounds.key? type.to_sym
 
@@ -110,6 +128,8 @@ module Hooksler
       fail RouteNotFound.new "route for #{name} not found" unless @routes.key? name.to_sym
 
       [ from_instance, @routes[name.to_sym] ]
+    rescue KeyError
+      nil
     end
   end
 end

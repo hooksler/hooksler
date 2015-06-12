@@ -21,24 +21,20 @@ module Hooksler
     end
 
     def call(env)
-      duration = Hitimes::Interval.measure do
+      req = Rack::Request.new(env)
 
-        req = Rack::Request.new(env)
+      from_instance, routes = Hooksler::Router.resolve_path req.fullpath
+      return ['410', {'Content-Type' => 'text/html'}, ['Gone']] unless from_instance
 
-        from_instance, routes = Hooksler::Router.resolve_path req.fullpath
-        return ['404', {'Content-Type' => 'text/html'}, ['404']] unless from_instance
+      message = from_instance.load(req)
 
-        message = from_instance.load(req)
-
-        routes.each do |route|
-          route.process(message)
-        end
+      routes.each do |route|
+        route.process(message)
       end
-
-      puts duration
 
       ['200', {'Content-Type' => 'text/html'}, ['']]
     rescue => e
+      puts e
       puts e.backtrace
       ['503', {'Content-Type' => 'text/html'}, [e.to_s]]
     end

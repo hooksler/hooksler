@@ -1,5 +1,0 @@
-source 'https://rubygems.org'
-
-gem 'hooksler', path: '..'
-gem 'thin'
-gem 'eventmachine'
