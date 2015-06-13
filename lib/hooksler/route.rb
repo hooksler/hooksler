@@ -1,3 +1,5 @@
+require 'hooksler'
+
 module Hooksler
   class Route
     attr_reader :from

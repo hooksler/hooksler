@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Hooksler::SimpleInput do
   subject { Hooksler::SimpleInput.build }
-  let(:request) { Struct.new(:body).new(StringIO.new("{}")) }
+  let(:request) { Hooksler::Test::Request.build '{}', 'Content-Type' => 'application/json' }
 
   it do
     should respond_to :load

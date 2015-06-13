@@ -1,3 +1,5 @@
+require 'hooksler'
+
 module Hooksler
 
   module Channel

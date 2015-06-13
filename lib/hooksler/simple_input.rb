@@ -1,4 +1,6 @@
+require 'hooksler'
 require 'multi_json'
+
 module Hooksler
   class SimpleInput
     extend Hooksler::Channel::Input

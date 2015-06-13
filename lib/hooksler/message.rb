@@ -1,3 +1,4 @@
+require 'hooksler'
 require 'hashie'
 
 module Hooksler
