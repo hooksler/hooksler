@@ -47,7 +47,7 @@ module Hooksler
       info = {}
       @instance.routes.each do |from, to_list|
         path = host_name + @instance.endpoints.path(from)
-        info[path] = {from => to_list}
+        info[path] = {from => to_list.map(&:name) }
       end
       info
     end

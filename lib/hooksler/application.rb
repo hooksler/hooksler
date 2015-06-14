@@ -1,4 +1,3 @@
-require 'hitimes'
 module Hooksler
   class Application
     def self.run
