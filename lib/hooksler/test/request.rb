@@ -14,9 +14,10 @@ module Hooksler
 end
 
 if defined? RSpec
+
   RSpec.shared_examples 'wrong input' do
 
-    let(:message) { subject.load request }
+    let(:message) { input.load request }
 
     it do
       expect { message }.to_not raise_error
@@ -29,7 +30,7 @@ if defined? RSpec
 
   RSpec.shared_examples 'correct input' do
 
-    let(:message) { subject.load request }
+    let(:message) { input.load request }
 
     it do
       expect { message }.to_not raise_error
@@ -40,4 +41,3 @@ if defined? RSpec
     end
   end
 end
-
