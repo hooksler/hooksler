@@ -25,10 +25,12 @@ module Hooksler
         from_instance, routes = Hooksler::Router.resolve_path req.fullpath
         return ['410', {'Content-Type' => 'text/html'}, ['Gone']] unless from_instance
 
-        message = from_instance.load(req)
+        messages = [*from_instance.load(req)].compact
 
         routes.each do |route|
-          route.process(message)
+          messages.each do |message|
+            route.process(message)
+          end
         end
 
         ['200', {'Content-Type' => 'text/plain'}, ['']]
