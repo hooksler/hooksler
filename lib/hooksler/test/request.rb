@@ -13,8 +13,8 @@ module Hooksler
   end
 end
 
-if defined? Rspec
-  Rspec.shared_example 'wrong input' do
+if defined? RSpec
+  RSpec.shared_examples 'wrong input' do
 
     let(:message) { subject.load request }
 
@@ -27,7 +27,7 @@ if defined? Rspec
     end
   end
 
-  Rspec.shared_example 'correct input' do
+  RSpec.shared_examples 'correct input' do
 
     let(:message) { subject.load request }
 
