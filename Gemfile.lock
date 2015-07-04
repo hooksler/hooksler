@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    hooksler (0.1.2)
+    hooksler (0.1.3)
       hashie
       multi_json
       rack
