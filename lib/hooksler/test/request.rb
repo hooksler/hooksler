@@ -5,7 +5,7 @@ module Hooksler
   module Test
     class Request < Rack::Request
       def self.build(data, opts = {})
-        opts[:input] = data
+        opts[:input] = data if data
         env = Rack::MockRequest.env_for('/', opts.merge(method: 'POST'))
         self.new env
       end
